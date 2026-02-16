@@ -1,22 +1,29 @@
-const express = require("express")
-const cors = require("cors")
-require("dotenv").config()
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-const app = express()
+const dictionaryRoutes = require("./routes/dictionary");
 
-app.use(cors())
-app.use(express.json())
+const app = express();
 
-app.get("/health", (req, res) => {
-res.json({ status: "ok" })
-})
-app.get('/test', (req, res) => {
-  res.json({ message: 'CORS is working!' });
-});
+app.use(cors());
+app.use(express.json());
 
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch(err => {
+    console.error("MongoDB connection error:", err);
+  });
 
-const PORT = process.env.PORT || 5000
+app.use("/api/dictionary", dictionaryRoutes);
+// app.use("/api/case-studies", caseStudiesRoutes);
+// app.use("/api/security-explained", securityExplainedRoutes);
+
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-console.log("Server running on port", PORT)
-})
-
+  console.log(`Backend running on port ${PORT}`);
+});
